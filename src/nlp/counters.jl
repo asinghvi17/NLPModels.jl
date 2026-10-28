@@ -112,11 +112,9 @@ sum_counters(nlp::AbstractNLPModel) = sum_counters(get_counters(nlp))
 
 Reset evaluation counters
 """
-function LinearOperators.reset!(counters::Counters)
-  for f in fieldnames(Counters)
-    setfield!(counters, f, 0)
-  end
-  return counters
+@generated function LinearOperators.reset!(counters::Counters)
+  assignments = [:(setfield!(counters, $(QuoteNode(f)), 0)) for f in fieldnames(Counters)]
+  return Expr(:block, assignments..., :(return counters))
 end
 
 """
